@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -90,6 +89,10 @@ const AdminLeads = () => {
       setSelectedCounselor('');
       setShowBulkAssign(false);
     }
+  };
+
+  const handleViewLead = (leadId: number) => {
+    navigate(`/lead/${leadId}`);
   };
 
   const getStageColor = (stage: string) => {
@@ -208,9 +211,9 @@ const AdminLeads = () => {
 
         {/* Results Summary */}
         <div className="mb-6">
-          <p className="text-sm text-gray-600">
+          <div className="text-sm text-gray-600">
             Showing {filteredLeads.length} leads in <Badge variant="outline" className={getStageColor(selectedStage)}>{selectedStage}</Badge> stage
-          </p>
+          </div>
         </div>
 
         {/* Leads Table */}
@@ -257,7 +260,11 @@ const AdminLeads = () => {
                   <TableCell>{lead.counselor || 'Unassigned'}</TableCell>
                   <TableCell>{lead.createdAt}</TableCell>
                   <TableCell>
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleViewLead(lead.id)}
+                    >
                       View
                     </Button>
                   </TableCell>
