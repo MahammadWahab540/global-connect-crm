@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
+import { useToast } from '@/hooks/use-toast';
 import { 
   ArrowLeft, 
   MoreVertical, 
@@ -727,6 +728,7 @@ const AdminStageManager = ({
 const LeadWorkspace = () => {
   const navigate = useNavigate();
   const { leadId } = useParams();
+  const { toast } = useToast();
   const [lead, setLead] = useState(initialLeadData);
   const [isStageModalOpen, setIsStageModalOpen] = useState(false);
   const [isAdminStageModalOpen, setIsAdminStageModalOpen] = useState(false);
@@ -760,13 +762,22 @@ const LeadWorkspace = () => {
       date: new Date().toISOString().split('T')[0], 
       user: 'Sarah Miller (Manual)' 
     }]);
+    
+    toast({
+      title: "Stage Updated",
+      description: `Lead manually moved to "${PIPELINE_STAGES[newStageIndex]}"`,
+    });
+    
     handleCloseStageModal();
   };
 
   const handleAdminStageChange = (newStageIndex: number, reason: string) => {
+    const previousStage = PIPELINE_STAGES[lead.currentStageIndex];
+    const newStage = PIPELINE_STAGES[newStageIndex];
+    
     setLead(prev => ({ ...prev, currentStageIndex: newStageIndex }));
     setHistory(prev => [...prev, { 
-      stage: PIPELINE_STAGES[newStageIndex], 
+      stage: newStage, 
       date: new Date().toISOString().split('T')[0], 
       user: `${currentUser.name} (Admin Override)` 
     }]);
@@ -775,6 +786,11 @@ const LeadWorkspace = () => {
       date: new Date().toISOString().split('T')[0], 
       user: currentUser.name 
     }]);
+    
+    toast({
+      title: "Admin Stage Change",
+      description: `Lead moved from "${previousStage}" to "${newStage}"`,
+    });
   };
   
   const handleTaskComplete = (taskData: TaskData, resultingStage: string | null) => {
@@ -812,10 +828,17 @@ const LeadWorkspace = () => {
           date: new Date().toISOString().split('T')[0], 
           user: 'Sarah Miller (Task)' 
         }]);
-        alert(`Task saved! Lead moved from "${currentStage}" to "${resultingStage}".`);
+        
+        toast({
+          title: "Task Saved & Stage Updated!",
+          description: `Lead automatically moved from "${currentStage}" to "${resultingStage}"`,
+        });
       }
     } else {
-      alert(`Task saved! No stage change triggered from "${currentStage}".`);
+      toast({
+        title: "Task Saved Successfully!",
+        description: "Task has been logged. No stage change triggered.",
+      });
     }
   };
 

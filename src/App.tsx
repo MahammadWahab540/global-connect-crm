@@ -1,119 +1,105 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-import AdminDashboard from "./pages/AdminDashboard";
-import AdminLeads from "./pages/AdminLeads";
-import LeadWorkspace from "./pages/LeadWorkspace";
-import CounselorDashboard from "./pages/CounselorDashboard";
-import CounselorLeads from "./pages/CounselorLeads";
-import ImportLeads from "./pages/ImportLeads";
-import ManageUsers from "./pages/ManageUsers";
-import ViewReports from "./pages/ViewReports";
-import NotFound from "./pages/NotFound";
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from '@/components/ui/toaster';
+import Auth from './pages/Auth';
+import AdminDashboard from './pages/AdminDashboard';
+import CounselorDashboard from './pages/CounselorDashboard';
+import AdminLeads from './pages/AdminLeads';
+import CounselorLeads from './pages/CounselorLeads';
+import ManageUsers from './pages/ManageUsers';
+import ImportLeads from './pages/ImportLeads';
+import ViewReports from './pages/ViewReports';
+import LeadWorkspace from './pages/LeadWorkspace';
+import NotFound from './pages/NotFound';
+import Index from './pages/Index';
 
-const queryClient = new QueryClient();
+// Mock authentication check
+const isAuthenticated = () => {
+  return localStorage.getItem('user') !== null;
+};
 
-// Protected Route Component
-const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactNode; requiredRole?: string }) => {
-  const userStr = localStorage.getItem('user');
-  if (!userStr) {
+const getUserRole = () => {
+  const user = localStorage.getItem('user');
+  return user ? JSON.parse(user).role : null;
+};
+
+// Protected Route component
+const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactNode, requiredRole?: string }) => {
+  if (!isAuthenticated()) {
     return <Navigate to="/auth" replace />;
   }
   
-  const user = JSON.parse(userStr);
-  
-  // If a specific role is required, check if user has that role
-  if (requiredRole && user.role !== requiredRole) {
-    return <Navigate to="/auth" replace />;
+  if (requiredRole && getUserRole() !== requiredRole) {
+    return <Navigate to="/" replace />;
   }
   
   return <>{children}</>;
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
+function App() {
+  return (
+    <Router>
+      <div className="min-h-screen bg-background">
         <Routes>
-          <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
-          <Route 
-            path="/admin" 
-            element={
-              <ProtectedRoute requiredRole="admin">
-                <AdminDashboard />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/admin/leads" 
-            element={
-              <ProtectedRoute requiredRole="admin">
-                <AdminLeads />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/admin/import-leads" 
-            element={
-              <ProtectedRoute requiredRole="admin">
-                <ImportLeads />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/admin/manage-users" 
-            element={
-              <ProtectedRoute requiredRole="admin">
-                <ManageUsers />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/admin/view-reports" 
-            element={
-              <ProtectedRoute requiredRole="admin">
-                <ViewReports />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/counselor" 
-            element={
-              <ProtectedRoute requiredRole="counselor">
-                <CounselorDashboard />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/counselor/leads" 
-            element={
-              <ProtectedRoute requiredRole="counselor">
-                <CounselorLeads />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/lead/:leadId" 
-            element={
-              <ProtectedRoute>
-                <LeadWorkspace />
-              </ProtectedRoute>
-            } 
-          />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/" element={
+            <ProtectedRoute>
+              <Index />
+            </ProtectedRoute>
+          } />
+          
+          {/* Admin Routes */}
+          <Route path="/admin/dashboard" element={
+            <ProtectedRoute requiredRole="admin">
+              <AdminDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/leads" element={
+            <ProtectedRoute requiredRole="admin">
+              <AdminLeads />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/manage-users" element={
+            <ProtectedRoute requiredRole="admin">
+              <ManageUsers />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/import-leads" element={
+            <ProtectedRoute requiredRole="admin">
+              <ImportLeads />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/reports" element={
+            <ProtectedRoute requiredRole="admin">
+              <ViewReports />
+            </ProtectedRoute>
+          } />
+          
+          {/* Counselor Routes */}
+          <Route path="/counselor/dashboard" element={
+            <ProtectedRoute requiredRole="counselor">
+              <CounselorDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/counselor/leads" element={
+            <ProtectedRoute requiredRole="counselor">
+              <CounselorLeads />
+            </ProtectedRoute>
+          } />
+          
+          {/* Shared Routes */}
+          <Route path="/lead/:leadId" element={
+            <ProtectedRoute>
+              <LeadWorkspace />
+            </ProtectedRoute>
+          } />
+          
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+        <Toaster />
+      </div>
+    </Router>
+  );
+}
 
 export default App;
