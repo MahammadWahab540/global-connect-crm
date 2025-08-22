@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { UserCheck, Clock, FileText, Calendar } from 'lucide-react';
+import { UserCheck, Clock, FileText, Calendar, Users, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const CounselorDashboard = () => {
@@ -25,9 +25,18 @@ const CounselorDashboard = () => {
               </div>
               <h1 className="text-xl font-semibold text-gray-900">Counselor Dashboard</h1>
             </div>
-            <Button variant="outline" onClick={handleLogout}>
-              Logout
-            </Button>
+            <div className="flex items-center gap-4">
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/counselor/leads')}
+              >
+                <Users className="h-4 w-4 mr-2" />
+                View All Leads
+              </Button>
+              <Button variant="outline" onClick={handleLogout}>
+                Logout
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -121,8 +130,20 @@ const CounselorDashboard = () => {
 
           <Card>
             <CardHeader>
-              <CardTitle>Recent Leads</CardTitle>
-              <CardDescription>Leads assigned to you recently</CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Recent Leads</CardTitle>
+                  <CardDescription>Leads assigned to you recently</CardDescription>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => navigate('/counselor/leads')}
+                >
+                  <Eye className="h-4 w-4 mr-1" />
+                  View All
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">

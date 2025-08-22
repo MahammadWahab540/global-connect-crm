@@ -10,6 +10,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminLeads from "./pages/AdminLeads";
 import LeadWorkspace from "./pages/LeadWorkspace";
 import CounselorDashboard from "./pages/CounselorDashboard";
+import CounselorLeads from "./pages/CounselorLeads";
 import ImportLeads from "./pages/ImportLeads";
 import ManageUsers from "./pages/ManageUsers";
 import ViewReports from "./pages/ViewReports";
@@ -88,6 +89,14 @@ const App = () => (
             element={
               <ProtectedRoute requiredRole="counselor">
                 <CounselorDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/counselor/leads" 
+            element={
+              <ProtectedRoute requiredRole="counselor">
+                <CounselorLeads />
               </ProtectedRoute>
             } 
           />
