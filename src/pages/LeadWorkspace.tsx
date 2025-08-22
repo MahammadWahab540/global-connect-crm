@@ -50,6 +50,33 @@ const DROPDOWN_OPTIONS = {
   visaStatus: ['Applied', 'In Process', 'Approved', 'Rejected'],
 };
 
+// Task data interface
+interface TaskData {
+  taskType?: string;
+  callType?: string;
+  connectStatus?: string;
+  country?: string;
+  intake?: string;
+  prevConsultancy?: string;
+  sessionStatus?: string;
+  isRescheduled?: string;
+  shortlistingInitiated?: string;
+  shortlistingStatus?: string;
+  finalStatus?: string;
+  applicationProcess?: string;
+  trackingStatus?: string;
+  applicationStatus?: string;
+  offerLetterStatus?: string;
+  visaStatus?: string;
+  remarks?: string;
+  universityName?: string;
+  universityUrl?: string;
+  username?: string;
+  password?: string;
+  applicationCount?: string;
+  sessionDate?: string;
+}
+
 // Mock lead data
 const initialLeadData = {
   id: 'LD-001',
@@ -75,7 +102,7 @@ const initialRemarks = [
 ];
 
 // Stage progression logic
-const getNextStageFromTask = (taskData, currentStage) => {
+const getNextStageFromTask = (taskData: TaskData, currentStage: string) => {
   const { taskType, connectStatus, finalStatus, applicationProcess, trackingStatus, offerLetterStatus, visaStatus } = taskData;
 
   if (taskType === 'Call' || taskType === 'Meet Done') {
@@ -94,7 +121,7 @@ const getNextStageFromTask = (taskData, currentStage) => {
     return 'Shortlisted Univ.';
   }
 
-  if (taskType === 'Application Process' && taskData.applicationProcess) {
+  if (taskType === 'Application Process' && applicationProcess) {
     return 'Application in Progress';
   }
 
@@ -111,12 +138,12 @@ const getNextStageFromTask = (taskData, currentStage) => {
 };
 
 // Task Composer Component
-const TaskComposer = ({ onTaskComplete, currentStage }) => {
+const TaskComposer = ({ onTaskComplete, currentStage }: { onTaskComplete: (taskData: TaskData, nextStage: string | null) => void; currentStage: string }) => {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-  const [taskData, setTaskData] = useState({});
+  const [taskData, setTaskData] = useState<TaskData>({});
   const [step, setStep] = useState(1);
 
-  const handleInputChange = (name, value) => {
+  const handleInputChange = (name: string, value: string) => {
     setTaskData(prev => ({ ...prev, [name]: value }));
   };
   
@@ -132,7 +159,7 @@ const TaskComposer = ({ onTaskComplete, currentStage }) => {
 
   const handleCloseModal = () => setIsTaskModalOpen(false);
   
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const nextStage = getNextStageFromTask(taskData, currentStage);
     onTaskComplete(taskData, nextStage);
@@ -276,7 +303,7 @@ const TaskComposer = ({ onTaskComplete, currentStage }) => {
 };
 
 // Lead Data Card Component
-const LeadDataCard = ({ lead, lastTask }) => {
+const LeadDataCard = ({ lead, lastTask }: { lead: typeof initialLeadData; lastTask: TaskData | null }) => {
   return (
     <Card>
       <CardHeader>
@@ -318,11 +345,11 @@ const LeadWorkspace = () => {
   const [isStageModalOpen, setIsStageModalOpen] = useState(false);
   const [history, setHistory] = useState(stageHistory);
   const [remarks, setRemarks] = useState(initialRemarks);
-  const [tasks, setTasks] = useState([]);
-  const [universityApps, setUniversityApps] = useState([]);
-  const [visiblePasswords, setVisiblePasswords] = useState({});
+  const [tasks, setTasks] = useState<TaskData[]>([]);
+  const [universityApps, setUniversityApps] = useState<Array<{name: string; url: string; username: string; password: string}>>([]);
+  const [visiblePasswords, setVisiblePasswords] = useState<Record<number, boolean>>({});
 
-  const togglePasswordVisibility = (index) => {
+  const togglePasswordVisibility = (index: number) => {
     setVisiblePasswords(prev => ({ ...prev, [index]: !prev[index] }));
   };
 
@@ -345,12 +372,12 @@ const LeadWorkspace = () => {
     handleCloseStageModal();
   };
   
-  const handleTaskComplete = (taskData, resultingStage) => {
+  const handleTaskComplete = (taskData: TaskData, resultingStage: string | null) => {
     setTasks(prev => [...prev, { 
       ...taskData, 
       date: new Date().toISOString().split('T')[0], 
       user: 'Sarah Miller' 
-    }]);
+    } as TaskData]);
 
     if (taskData.remarks) {
       setRemarks(prev => [...prev, { 
@@ -362,10 +389,10 @@ const LeadWorkspace = () => {
 
     if (taskData.taskType === 'Tracking' && taskData.trackingStatus === 'Credentials logging') {
       setUniversityApps(prev => [...prev, {
-        name: taskData.universityName,
-        url: taskData.universityUrl,
-        username: taskData.username,
-        password: taskData.password,
+        name: taskData.universityName || '',
+        url: taskData.universityUrl || '',
+        username: taskData.username || '',
+        password: taskData.password || '',
       }]);
     }
 
