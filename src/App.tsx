@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminLeads from "./pages/AdminLeads";
+import LeadWorkspace from "./pages/LeadWorkspace";
 import CounselorDashboard from "./pages/CounselorDashboard";
 import ImportLeads from "./pages/ImportLeads";
 import ManageUsers from "./pages/ManageUsers";
@@ -87,6 +88,14 @@ const App = () => (
             element={
               <ProtectedRoute requiredRole="counselor">
                 <CounselorDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/lead/:leadId" 
+            element={
+              <ProtectedRoute>
+                <LeadWorkspace />
               </ProtectedRoute>
             } 
           />
