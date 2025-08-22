@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -94,6 +93,14 @@ const AdminDashboard = () => {
               <CardDescription>Common administrative tasks</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <Button 
+                className="w-full justify-start" 
+                variant="outline"
+                onClick={() => navigate('/admin/leads')}
+              >
+                <Users className="mr-2 h-4 w-4" />
+                Manage Leads
+              </Button>
               <Button 
                 className="w-full justify-start" 
                 variant="outline"

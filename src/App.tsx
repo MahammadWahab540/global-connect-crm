@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminLeads from "./pages/AdminLeads";
 import CounselorDashboard from "./pages/CounselorDashboard";
 import ImportLeads from "./pages/ImportLeads";
 import ManageUsers from "./pages/ManageUsers";
@@ -44,6 +44,14 @@ const App = () => (
             element={
               <ProtectedRoute requiredRole="admin">
                 <AdminDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/leads" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminLeads />
               </ProtectedRoute>
             } 
           />
