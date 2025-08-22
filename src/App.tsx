@@ -8,6 +8,9 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import AdminDashboard from "./pages/AdminDashboard";
 import CounselorDashboard from "./pages/CounselorDashboard";
+import ImportLeads from "./pages/ImportLeads";
+import ManageUsers from "./pages/ManageUsers";
+import ViewReports from "./pages/ViewReports";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,7 +23,7 @@ const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactNode;
   }
   
   const user = JSON.parse(userStr);
-  if (requiredRole && user.role !== requiredRole) {
+  if (requiredRole && user.role !== 'admin') {
     return <Navigate to="/auth" replace />;
   }
   
@@ -41,6 +44,30 @@ const App = () => (
             element={
               <ProtectedRoute requiredRole="admin">
                 <AdminDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/import-leads" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <ImportLeads />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/manage-users" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <ManageUsers />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/view-reports" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <ViewReports />
               </ProtectedRoute>
             } 
           />

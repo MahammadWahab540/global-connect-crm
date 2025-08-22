@@ -94,15 +94,27 @@ const AdminDashboard = () => {
               <CardDescription>Common administrative tasks</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Button className="w-full justify-start" variant="outline">
+              <Button 
+                className="w-full justify-start" 
+                variant="outline"
+                onClick={() => navigate('/admin/import-leads')}
+              >
                 <UserPlus className="mr-2 h-4 w-4" />
                 Import New Leads
               </Button>
-              <Button className="w-full justify-start" variant="outline">
+              <Button 
+                className="w-full justify-start" 
+                variant="outline"
+                onClick={() => navigate('/admin/manage-users')}
+              >
                 <Users className="mr-2 h-4 w-4" />
                 Manage Users
               </Button>
-              <Button className="w-full justify-start" variant="outline">
+              <Button 
+                className="w-full justify-start" 
+                variant="outline"
+                onClick={() => navigate('/admin/view-reports')}
+              >
                 <FileText className="mr-2 h-4 w-4" />
                 View Reports
               </Button>
