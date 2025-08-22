@@ -49,6 +49,11 @@ function App() {
           } />
           
           {/* Admin Routes */}
+          <Route path="/admin" element={
+            <ProtectedRoute requiredRole="admin">
+              <Navigate to="/admin/dashboard" replace />
+            </ProtectedRoute>
+          } />
           <Route path="/admin/dashboard" element={
             <ProtectedRoute requiredRole="admin">
               <AdminDashboard />
@@ -76,6 +81,11 @@ function App() {
           } />
           
           {/* Counselor Routes */}
+          <Route path="/counselor" element={
+            <ProtectedRoute requiredRole="counselor">
+              <Navigate to="/counselor/dashboard" replace />
+            </ProtectedRoute>
+          } />
           <Route path="/counselor/dashboard" element={
             <ProtectedRoute requiredRole="counselor">
               <CounselorDashboard />
