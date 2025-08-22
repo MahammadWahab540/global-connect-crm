@@ -18,26 +18,41 @@ import {
   MessageSquare, 
   ClipboardList,
   Eye,
-  EyeOff
+  EyeOff,
+  Settings
 } from 'lucide-react';
 
-// Pipeline stages
+// Complete pipeline stages as per documentation
 const PIPELINE_STAGES = [
-  'Yet to Assign', 'Yet to Contact', 'Contact Again', 'Not Interested', 'Planning Later', 
-  'Yet to Decide', 'Irrelevant Lead', 'Registered for Session', 'Session Completed', 
-  'Docs Submitted', 'Shortlisted Univ.', 'Application in Progress', 'Offer Letter Received',
-  'Deposit Paid', 'Visa Received', 'Flight and Accommodation Booked', 'Tuition Fee Paid', 'Commission Received'
+  'Yet to Assign', 
+  'Yet to Contact', 
+  'Contact Again', 
+  'Not Interested', 
+  'Planning Later', 
+  'Yet to Decide', 
+  'Irrelevant Lead', 
+  'Registered for Session', 
+  'Session Completed', 
+  'Docs Submitted', 
+  'Shortlisted Univ.', 
+  'Application in Progress', 
+  'Offer Letter Received',
+  'Deposit Paid', 
+  'Visa Received', 
+  'Flight and Accommodation Booked', 
+  'Tuition Fee Paid', 
+  'Commission Received'
 ];
 
-// Dropdown options
+// Complete dropdown options as per documentation
 const DROPDOWN_OPTIONS = {
-  taskType: ['Call', 'Meet Done', 'Shortlisting', 'Application Process', 'Tracking'],
+  taskType: ['Call', 'Meet Done', 'Shortlisting', 'Application Process', 'Tracking', 'Submit Documents'],
   callType: ['Intro Call', 'Session Follow up call', 'Session Reminder Call', 'Followup Call'],
-  connectStatus: ['Interested', 'Not Interested', 'Planning later', 'Yet to Decide', 'Irrelevant', 'Other Preferred Language', 'Casual Follow-up', 'Session Scheduling'],
-  country: ['USA', 'Canada', 'UK', 'Australia', 'Singapore'],
-  intake: ['Fall 2024', 'Spring 2025', 'Fall 2025', 'Spring 2026'],
+  connectStatus: ['Interested', 'Not Interested', 'Planning later', 'Yet to Decide', 'Irrelevant', 'DNP', 'Call back', 'Call Rejected', 'Other Preferred Language', 'Casual Follow-up', 'Session Scheduling'],
+  country: ['USA', 'Canada', 'UK', 'Australia', 'Singapore', 'Germany', 'Ireland', 'New Zealand'],
+  intake: ['Fall 2024', 'Spring 2025', 'Fall 2025', 'Spring 2026', 'Fall 2026'],
   prevConsultancy: ['Application Started', 'Offer Received', 'In Loan Process', "No, haven't started", 'Session Scheduled'],
-  sessionStatus: ['Confirmed, Will attend', 'Rescheduled'],
+  sessionStatus: ['Confirmed, Will attend', 'Rescheduled', 'Cancelled', 'Completed'],
   isRescheduled: ['Yes', 'No'],
   shortlistingInitiated: ['Requested In KC', 'Done by own'],
   shortlistingStatus: ['New Shortlisting', 'Add-on Shortlisting'],
@@ -47,9 +62,12 @@ const DROPDOWN_OPTIONS = {
   applicationStatus: ['Application submitted to KC', 'Application submitted to university', 'Docs Pending', 'In Progress', 'Awaiting decision', 'Accepted', 'Rejected'],
   offerLetterStatus: ['Conditional', 'Unconditional'],
   visaStatus: ['Applied', 'In Process', 'Approved', 'Rejected'],
+  depositStatus: ['Paid', 'Pending', 'Not Required'],
+  tuitionStatus: ['Paid', 'Pending', 'Partial Payment'],
+  commissionStatus: ['Received', 'Pending', 'Processing']
 };
 
-// Task data interface
+// Enhanced Task data interface
 interface TaskData {
   taskType?: string;
   callType?: string;
@@ -58,22 +76,27 @@ interface TaskData {
   intake?: string;
   prevConsultancy?: string;
   sessionStatus?: string;
+  sessionDate?: string;
   isRescheduled?: string;
   shortlistingInitiated?: string;
   shortlistingStatus?: string;
   finalStatus?: string;
   applicationProcess?: string;
+  applicationCount?: string;
   trackingStatus?: string;
   applicationStatus?: string;
   offerLetterStatus?: string;
   visaStatus?: string;
+  depositStatus?: string;
+  tuitionStatus?: string;
+  commissionStatus?: string;
   remarks?: string;
   universityName?: string;
   universityUrl?: string;
   username?: string;
   password?: string;
-  applicationCount?: string;
-  sessionDate?: string;
+  reasonNotInterested?: string;
+  preferredLanguage?: string;
   user?: string;
   date?: string;
 }
@@ -102,30 +125,68 @@ const initialRemarks = [
   { remark: 'Initial inquiry from website.', date: '2023-10-26', user: 'System' },
 ];
 
-// Stage progression logic
+// Enhanced stage progression logic based on documentation
 const getNextStageFromTask = (taskData: TaskData, currentStage: string) => {
-  const { taskType, connectStatus, finalStatus, applicationProcess, trackingStatus, offerLetterStatus, visaStatus } = taskData;
+  const { taskType, connectStatus, finalStatus, applicationProcess, trackingStatus, offerLetterStatus, visaStatus, depositStatus, tuitionStatus, commissionStatus } = taskData;
 
-  if (taskType === 'Call' || taskType === 'Meet Done') {
+  // Call task logic
+  if (taskType === 'Call') {
     switch (connectStatus) {
-      case 'Interested': return taskType === 'Meet Done' ? 'Session Completed' : null;
-      case 'Not Interested': return 'Not Interested';
-      case 'Planning later': return 'Planning Later';
-      case 'Yet to Decide': return 'Yet to Decide';
-      case 'Irrelevant': return 'Irrelevant Lead';
-      case 'Session Scheduling': return 'Registered for Session';
-      default: return null;
+      case 'DNP':
+      case 'Call back':
+      case 'Call Rejected':
+        return 'Contact Again';
+      case 'Not Interested':
+        return 'Not Interested';
+      case 'Planning later':
+        return 'Planning Later';
+      case 'Yet to Decide':
+        return 'Yet to Decide';
+      case 'Irrelevant':
+        return 'Irrelevant Lead';
+      case 'Session Scheduling':
+        return 'Registered for Session';
+      default:
+        return null;
     }
   }
-  
+
+  // Meet Done task logic
+  if (taskType === 'Meet Done') {
+    switch (connectStatus) {
+      case 'Interested':
+        return 'Session Completed';
+      case 'Not Interested':
+        return 'Not Interested';
+      case 'Planning later':
+        return 'Planning Later';
+      case 'Yet to Decide':
+        return 'Yet to Decide';
+      case 'Irrelevant':
+        return 'Irrelevant Lead';
+      case 'Session Scheduling':
+        return 'Registered for Session';
+      default:
+        return null;
+    }
+  }
+
+  // Submit Documents task
+  if (taskType === 'Submit Documents') {
+    return 'Docs Submitted';
+  }
+
+  // Shortlisting task logic
   if (taskType === 'Shortlisting' && finalStatus === 'Sent to students') {
     return 'Shortlisted Univ.';
   }
 
-  if (taskType === 'Application Process' && applicationProcess) {
+  // Application Process task logic
+  if (taskType === 'Application Process') {
     return 'Application in Progress';
   }
 
+  // Tracking task logic
   if (taskType === 'Tracking') {
     if (trackingStatus === 'Offer Letter Status' && offerLetterStatus) {
       return 'Offer Letter Received';
@@ -133,12 +194,21 @@ const getNextStageFromTask = (taskData: TaskData, currentStage: string) => {
     if (trackingStatus === 'VISA Tracking' && visaStatus === 'Approved') {
       return 'Visa Received';
     }
+    if (depositStatus === 'Paid') {
+      return 'Deposit Paid';
+    }
+    if (tuitionStatus === 'Paid') {
+      return 'Tuition Fee Paid';
+    }
+    if (commissionStatus === 'Received') {
+      return 'Commission Received';
+    }
   }
 
   return null;
 };
 
-// Task Composer Component
+// Enhanced Task Composer Component
 const TaskComposer = ({ onTaskComplete, currentStage }: { onTaskComplete: (taskData: TaskData, nextStage: string | null) => void; currentStage: string }) => {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [taskData, setTaskData] = useState<TaskData>({});
@@ -184,6 +254,7 @@ const TaskComposer = ({ onTaskComplete, currentStage }: { onTaskComplete: (taskD
             </Select>
           </div>
         );
+      
       case 2:
         if (taskData.taskType === 'Call') {
           return (
@@ -201,10 +272,16 @@ const TaskComposer = ({ onTaskComplete, currentStage }: { onTaskComplete: (taskD
             </div>
           );
         }
-        if (taskData.taskType === 'Meet Done') {
+        
+        if (taskData.taskType === 'Meet Done' || taskData.taskType === 'Call') {
           return (
             <div className="space-y-4">
-              <Select value={taskData.connectStatus || ''} onValueChange={(value) => { handleInputChange('connectStatus', value); setStep(3); }}>
+              <Select value={taskData.connectStatus || ''} onValueChange={(value) => { 
+                handleInputChange('connectStatus', value); 
+                if (value === 'Interested') setStep(4);
+                else if (['Not Interested', 'Planning later', 'Yet to Decide'].includes(value)) setStep(5);
+                else setStep(6);
+              }}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select Connect Status..." />
                 </SelectTrigger>
@@ -217,6 +294,20 @@ const TaskComposer = ({ onTaskComplete, currentStage }: { onTaskComplete: (taskD
             </div>
           );
         }
+
+        if (taskData.taskType === 'Submit Documents') {
+          return (
+            <div className="space-y-4">
+              <Textarea 
+                placeholder="Add remarks about document submission..."
+                value={taskData.remarks || ''}
+                onChange={(e) => handleInputChange('remarks', e.target.value)}
+              />
+              <Button type="submit" className="w-full">Save Task & Update Stage</Button>
+            </div>
+          );
+        }
+
         if (taskData.taskType === 'Shortlisting') {
           return (
             <div className="space-y-4">
@@ -230,12 +321,32 @@ const TaskComposer = ({ onTaskComplete, currentStage }: { onTaskComplete: (taskD
                   ))}
                 </SelectContent>
               </Select>
+              <Select value={taskData.shortlistingStatus || ''} onValueChange={(value) => handleInputChange('shortlistingStatus', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Shortlisting Status..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {DROPDOWN_OPTIONS.shortlistingStatus.map(option => (
+                    <SelectItem key={option} value={option}>{option}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <Select value={taskData.country || ''} onValueChange={(value) => handleInputChange('country', value)}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select Country..." />
                 </SelectTrigger>
                 <SelectContent>
                   {DROPDOWN_OPTIONS.country.map(option => (
+                    <SelectItem key={option} value={option}>{option}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={taskData.intake || ''} onValueChange={(value) => handleInputChange('intake', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Intake..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {DROPDOWN_OPTIONS.intake.map(option => (
                     <SelectItem key={option} value={option}>{option}</SelectItem>
                   ))}
                 </SelectContent>
@@ -254,8 +365,111 @@ const TaskComposer = ({ onTaskComplete, currentStage }: { onTaskComplete: (taskD
             </div>
           );
         }
-        return <p>This task type is not fully configured yet.</p>;
-      case 3:
+
+        if (taskData.taskType === 'Application Process') {
+          return (
+            <div className="space-y-4">
+              <Select value={taskData.applicationProcess || ''} onValueChange={(value) => handleInputChange('applicationProcess', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Application Process..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {DROPDOWN_OPTIONS.applicationProcess.map(option => (
+                    <SelectItem key={option} value={option}>{option}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input
+                placeholder="How many applications submitted to KC?"
+                value={taskData.applicationCount || ''}
+                onChange={(e) => handleInputChange('applicationCount', e.target.value)}
+              />
+              <Button type="submit" className="w-full">Save Task & Update Stage</Button>
+            </div>
+          );
+        }
+
+        if (taskData.taskType === 'Tracking') {
+          return (
+            <div className="space-y-4">
+              <Select value={taskData.trackingStatus || ''} onValueChange={(value) => { 
+                handleInputChange('trackingStatus', value); 
+                setStep(7);
+              }}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Tracking Status..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {DROPDOWN_OPTIONS.trackingStatus.map(option => (
+                    <SelectItem key={option} value={option}>{option}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          );
+        }
+
+        return <p>Please select a task type to continue.</p>;
+
+      case 4: // Interested flow
+        return (
+          <div className="space-y-4">
+            <Select value={taskData.country || ''} onValueChange={(value) => handleInputChange('country', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Country..." />
+              </SelectTrigger>
+              <SelectContent>
+                {DROPDOWN_OPTIONS.country.map(option => (
+                  <SelectItem key={option} value={option}>{option}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={taskData.intake || ''} onValueChange={(value) => handleInputChange('intake', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Planning Intake..." />
+              </SelectTrigger>
+              <SelectContent>
+                {DROPDOWN_OPTIONS.intake.map(option => (
+                  <SelectItem key={option} value={option}>{option}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={taskData.prevConsultancy || ''} onValueChange={(value) => handleInputChange('prevConsultancy', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Previous Consultancy..." />
+              </SelectTrigger>
+              <SelectContent>
+                {DROPDOWN_OPTIONS.prevConsultancy.map(option => (
+                  <SelectItem key={option} value={option}>{option}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button onClick={() => setStep(6)} className="w-full">Continue</Button>
+          </div>
+        );
+
+      case 5: // Not Interested/Planning Later/Yet to Decide flow
+        return (
+          <div className="space-y-4">
+            {taskData.connectStatus === 'Not Interested' && (
+              <Textarea
+                placeholder="Reason for not being interested..."
+                value={taskData.reasonNotInterested || ''}
+                onChange={(e) => handleInputChange('reasonNotInterested', e.target.value)}
+              />
+            )}
+            {taskData.connectStatus === 'Other Preferred Language' && (
+              <Input
+                placeholder="Preferred language..."
+                value={taskData.preferredLanguage || ''}
+                onChange={(e) => handleInputChange('preferredLanguage', e.target.value)}
+              />
+            )}
+            <Button onClick={() => setStep(6)} className="w-full">Continue</Button>
+          </div>
+        );
+
+      case 6: // Final remarks step
         return (
           <div className="space-y-4">
             <Textarea 
@@ -266,6 +480,98 @@ const TaskComposer = ({ onTaskComplete, currentStage }: { onTaskComplete: (taskD
             <Button type="submit" className="w-full">Save Task</Button>
           </div>
         );
+
+      case 7: // Tracking specific fields
+        if (taskData.trackingStatus === 'Credentials logging') {
+          return (
+            <div className="space-y-4">
+              <Input
+                placeholder="University Name"
+                value={taskData.universityName || ''}
+                onChange={(e) => handleInputChange('universityName', e.target.value)}
+              />
+              <Input
+                placeholder="University URL"
+                value={taskData.universityUrl || ''}
+                onChange={(e) => handleInputChange('universityUrl', e.target.value)}
+              />
+              <Input
+                placeholder="Username"
+                value={taskData.username || ''}
+                onChange={(e) => handleInputChange('username', e.target.value)}
+              />
+              <Input
+                placeholder="Password"
+                type="password"
+                value={taskData.password || ''}
+                onChange={(e) => handleInputChange('password', e.target.value)}
+              />
+              <Button type="submit" className="w-full">Save Task</Button>
+            </div>
+          );
+        }
+
+        if (taskData.trackingStatus === 'Application Status') {
+          return (
+            <div className="space-y-4">
+              <Input
+                placeholder="Number of applications being tracked"
+                value={taskData.applicationCount || ''}
+                onChange={(e) => handleInputChange('applicationCount', e.target.value)}
+              />
+              <Select value={taskData.applicationStatus || ''} onValueChange={(value) => handleInputChange('applicationStatus', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Application Status..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {DROPDOWN_OPTIONS.applicationStatus.map(option => (
+                    <SelectItem key={option} value={option}>{option}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button type="submit" className="w-full">Save Task</Button>
+            </div>
+          );
+        }
+
+        if (taskData.trackingStatus === 'Offer Letter Status') {
+          return (
+            <div className="space-y-4">
+              <Select value={taskData.offerLetterStatus || ''} onValueChange={(value) => handleInputChange('offerLetterStatus', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Offer Letter Status..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {DROPDOWN_OPTIONS.offerLetterStatus.map(option => (
+                    <SelectItem key={option} value={option}>{option}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button type="submit" className="w-full">Save Task</Button>
+            </div>
+          );
+        }
+
+        if (taskData.trackingStatus === 'VISA Tracking') {
+          return (
+            <div className="space-y-4">
+              <Select value={taskData.visaStatus || ''} onValueChange={(value) => handleInputChange('visaStatus', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select VISA Status..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {DROPDOWN_OPTIONS.visaStatus.map(option => (
+                    <SelectItem key={option} value={option}>{option}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button type="submit" className="w-full">Save Task</Button>
+            </div>
+          );
+        }
+
+        return <Button type="submit" className="w-full">Save Task</Button>;
+
       default:
         return null;
     }
@@ -286,7 +592,7 @@ const TaskComposer = ({ onTaskComplete, currentStage }: { onTaskComplete: (taskD
 
       {isTaskModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-background w-full max-w-lg p-6 rounded-lg shadow-xl m-4">
+          <div className="bg-background w-full max-w-lg p-6 rounded-lg shadow-xl m-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Create New Task</h2>
               <Button variant="ghost" size="sm" onClick={handleCloseModal}>
@@ -339,16 +645,100 @@ const LeadDataCard = ({ lead, lastTask }: { lead: typeof initialLeadData; lastTa
   );
 };
 
+// Admin Stage Manager Component
+const AdminStageManager = ({ 
+  lead, 
+  onStageChange, 
+  isOpen, 
+  onClose 
+}: { 
+  lead: typeof initialLeadData; 
+  onStageChange: (newStageIndex: number, reason: string) => void;
+  isOpen: boolean;
+  onClose: () => void;
+}) => {
+  const [selectedStageIndex, setSelectedStageIndex] = useState(lead.currentStageIndex);
+  const [reason, setReason] = useState('');
+
+  const handleConfirm = () => {
+    if (selectedStageIndex !== lead.currentStageIndex && reason.trim()) {
+      onStageChange(selectedStageIndex, reason);
+      onClose();
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div className="bg-background w-full max-w-md p-6 rounded-lg shadow-xl m-4">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">Admin: Change Stage</h2>
+          <Button variant="ghost" size="sm" onClick={onClose}>
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
+        
+        <div className="space-y-4">
+          <div>
+            <p className="text-sm text-muted-foreground mb-2">Current Stage</p>
+            <Badge variant="outline">{PIPELINE_STAGES[lead.currentStageIndex]}</Badge>
+          </div>
+          
+          <div>
+            <label className="text-sm font-medium">New Stage</label>
+            <Select value={selectedStageIndex.toString()} onValueChange={(value) => setSelectedStageIndex(parseInt(value))}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {PIPELINE_STAGES.map((stage, index) => (
+                  <SelectItem key={index} value={index.toString()}>{stage}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div>
+            <label className="text-sm font-medium">Reason for Change</label>
+            <Textarea
+              placeholder="Provide a reason for this manual stage change..."
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              required
+            />
+          </div>
+          
+          <div className="flex justify-end gap-3">
+            <Button variant="outline" onClick={onClose}>Cancel</Button>
+            <Button 
+              onClick={handleConfirm}
+              disabled={selectedStageIndex === lead.currentStageIndex || !reason.trim()}
+            >
+              Change Stage
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const LeadWorkspace = () => {
   const navigate = useNavigate();
   const { leadId } = useParams();
   const [lead, setLead] = useState(initialLeadData);
   const [isStageModalOpen, setIsStageModalOpen] = useState(false);
+  const [isAdminStageModalOpen, setIsAdminStageModalOpen] = useState(false);
   const [history, setHistory] = useState(stageHistory);
   const [remarks, setRemarks] = useState(initialRemarks);
   const [tasks, setTasks] = useState<TaskData[]>([]);
   const [universityApps, setUniversityApps] = useState<Array<{name: string; url: string; username: string; password: string}>>([]);
   const [visiblePasswords, setVisiblePasswords] = useState<Record<number, boolean>>({});
+
+  // Check if current user is admin
+  const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+  const isAdmin = currentUser.role === 'admin';
 
   const togglePasswordVisibility = (index: number) => {
     setVisiblePasswords(prev => ({ ...prev, [index]: !prev[index] }));
@@ -371,6 +761,20 @@ const LeadWorkspace = () => {
       user: 'Sarah Miller (Manual)' 
     }]);
     handleCloseStageModal();
+  };
+
+  const handleAdminStageChange = (newStageIndex: number, reason: string) => {
+    setLead(prev => ({ ...prev, currentStageIndex: newStageIndex }));
+    setHistory(prev => [...prev, { 
+      stage: PIPELINE_STAGES[newStageIndex], 
+      date: new Date().toISOString().split('T')[0], 
+      user: `${currentUser.name} (Admin Override)` 
+    }]);
+    setRemarks(prev => [...prev, { 
+      remark: `Admin stage change: ${reason}`, 
+      date: new Date().toISOString().split('T')[0], 
+      user: currentUser.name 
+    }]);
   };
   
   const handleTaskComplete = (taskData: TaskData, resultingStage: string | null) => {
@@ -442,6 +846,16 @@ const LeadWorkspace = () => {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              {isAdmin && (
+                <Button 
+                  variant="outline"
+                  onClick={() => setIsAdminStageModalOpen(true)}
+                  className="flex items-center gap-2"
+                >
+                  <Settings className="w-4 h-4" />
+                  Admin: Change Stage
+                </Button>
+              )}
               <Button variant="outline" size="sm">
                 <MoreVertical className="w-4 h-4" />
               </Button>
@@ -635,6 +1049,14 @@ const LeadWorkspace = () => {
           </div>
         </div>
       )}
+
+      {/* Admin Stage Manager Modal */}
+      <AdminStageManager
+        lead={lead}
+        onStageChange={handleAdminStageChange}
+        isOpen={isAdminStageModalOpen}
+        onClose={() => setIsAdminStageModalOpen(false)}
+      />
     </div>
   );
 };
