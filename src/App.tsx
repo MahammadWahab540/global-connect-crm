@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -23,7 +24,9 @@ const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactNode;
   }
   
   const user = JSON.parse(userStr);
-  if (requiredRole && user.role !== 'admin') {
+  
+  // If a specific role is required, check if user has that role
+  if (requiredRole && user.role !== requiredRole) {
     return <Navigate to="/auth" replace />;
   }
   
