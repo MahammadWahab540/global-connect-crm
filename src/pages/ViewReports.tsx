@@ -2,12 +2,34 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, FileText, TrendingUp, Users, Target, Download } from 'lucide-react';
+import { ArrowLeft, FileText, TrendingUp, Users, Target, Download, Filter } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, FunnelChart, Funnel, LabelList } from 'recharts';
 
 const ViewReports = () => {
   const navigate = useNavigate();
+
+  // Stage-wise funnel data
+  const stageWiseFunnelData = [
+    { stage: 'Yet to Assign', count: 324, color: '#ef4444' },
+    { stage: 'Yet to Contact', count: 187, color: '#f97316' },
+    { stage: 'Not Interested', count: 145, color: '#6b7280' },
+    { stage: 'Planning Later', count: 98, color: '#8b5cf6' },
+    { stage: 'Yet to Decide', count: 156, color: '#06b6d4' },
+    { stage: 'Irrelevant Lead', count: 67, color: '#64748b' },
+    { stage: 'Contact Again', count: 89, color: '#f59e0b' },
+    { stage: 'Registered for Session', count: 145, color: '#10b981' },
+    { stage: 'Session Completed', count: 112, color: '#059669' },
+    { stage: 'Docs Submitted', count: 87, color: '#0d9488' },
+    { stage: 'Shortlisted Univ.', count: 72, color: '#0891b2' },
+    { stage: 'Application in Progress', count: 64, color: '#0284c7' },
+    { stage: 'Offer Letter Received', count: 45, color: '#2563eb' },
+    { stage: 'Deposit Paid', count: 38, color: '#4f46e5' },
+    { stage: 'Visa Received', count: 32, color: '#7c3aed' },
+    { stage: 'Flight and Accommodation Booked', count: 28, color: '#9333ea' },
+    { stage: 'Tuition Fee Paid', count: 25, color: '#a855f7' },
+    { stage: 'Commission Received', count: 22, color: '#22c55e' },
+  ];
 
   const monthlyData = [
     { month: 'Jan', leads: 120, conversions: 45 },
@@ -25,13 +47,10 @@ const ViewReports = () => {
     { name: 'John Brown', leads: 38, conversions: 25, rate: '66%' },
   ];
 
-  const stageData = [
-    { name: 'Initial Contact', value: 35, color: '#3b82f6' },
-    { name: 'Consultation', value: 25, color: '#10b981' },
-    { name: 'Application', value: 20, color: '#f59e0b' },
-    { name: 'Visa Process', value: 15, color: '#ef4444' },
-    { name: 'Completed', value: 5, color: '#8b5cf6' },
-  ];
+  // Top performing stages for pie chart
+  const topStagesData = stageWiseFunnelData
+    .slice(0, 8)
+    .map(item => ({ name: item.stage, value: item.count, color: item.color }));
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -46,7 +65,7 @@ const ViewReports = () => {
               <div className="bg-primary text-primary-foreground p-2 rounded-lg mr-3">
                 <FileText className="h-5 w-5" />
               </div>
-              <h1 className="text-xl font-semibold text-gray-900">View Reports</h1>
+              <h1 className="text-xl font-semibold text-gray-900">Reports & Analytics</h1>
             </div>
             <Button>
               <Download className="mr-2 h-4 w-4" />
@@ -66,19 +85,30 @@ const ViewReports = () => {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">1,254</div>
+              <div className="text-2xl font-bold">2,058</div>
               <p className="text-xs text-muted-foreground">+12% from last month</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Conversions</CardTitle>
+              <CardTitle className="text-sm font-medium">Active Leads</CardTitle>
               <Target className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">316</div>
-              <p className="text-xs text-muted-foreground">+8% from last month</p>
+              <div className="text-2xl font-bold">1,234</div>
+              <p className="text-xs text-muted-foreground">Currently in progress</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Commission Received</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">22</div>
+              <p className="text-xs text-muted-foreground">Completed applications</p>
             </CardContent>
           </Card>
 
@@ -88,22 +118,123 @@ const ViewReports = () => {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">25.2%</div>
-              <p className="text-xs text-muted-foreground">+2.1% from last month</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Revenue</CardTitle>
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">$84,200</div>
-              <p className="text-xs text-muted-foreground">+15% from last month</p>
+              <div className="text-2xl font-bold">1.07%</div>
+              <p className="text-xs text-muted-foreground">Yet to Assign → Commission</p>
             </CardContent>
           </Card>
         </div>
+
+        {/* Stage-wise Funnel */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Stage-wise Lead Funnel</CardTitle>
+            <CardDescription>Distribution of leads across all 18 stages</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Bar Chart */}
+              <div>
+                <h3 className="text-sm font-medium mb-4">Lead Count by Stage</h3>
+                <ResponsiveContainer width="100%" height={600}>
+                  <BarChart 
+                    data={stageWiseFunnelData} 
+                    layout="horizontal"
+                    margin={{ top: 5, right: 30, left: 120, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" />
+                    <YAxis 
+                      type="category" 
+                      dataKey="stage" 
+                      width={120}
+                      tick={{ fontSize: 11 }}
+                    />
+                    <Tooltip />
+                    <Bar dataKey="count" fill="#3b82f6" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Top Stages Pie Chart */}
+              <div>
+                <h3 className="text-sm font-medium mb-4">Top 8 Stages Distribution</h3>
+                <ResponsiveContainer width="100%" height={600}>
+                  <PieChart>
+                    <Pie
+                      data={topStagesData}
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={150}
+                      dataKey="value"
+                      label={({ name, percent }) => `${(percent * 100).toFixed(1)}%`}
+                    >
+                      {topStagesData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Stage Summary Table */}
+            <div className="mt-8">
+              <h3 className="text-sm font-medium mb-4">Detailed Stage Breakdown</h3>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Stage
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Lead Count
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Percentage
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Trend
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {stageWiseFunnelData.map((stage, index) => {
+                      const totalLeads = stageWiseFunnelData.reduce((sum, s) => sum + s.count, 0);
+                      const percentage = ((stage.count / totalLeads) * 100).toFixed(1);
+                      return (
+                        <tr key={index}>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div 
+                                className="w-3 h-3 rounded-full mr-3" 
+                                style={{ backgroundColor: stage.color }}
+                              ></div>
+                              <div className="text-sm font-medium text-gray-900">{stage.stage}</div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {stage.count}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {percentage}%
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
+                              <span className="text-sm text-green-600">+5%</span>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
@@ -127,29 +258,27 @@ const ViewReports = () => {
             </CardContent>
           </Card>
 
-          {/* Lead Stage Distribution */}
+          {/* Conversion Trend */}
           <Card>
             <CardHeader>
-              <CardTitle>Lead Stage Distribution</CardTitle>
-              <CardDescription>Current leads by stage</CardDescription>
+              <CardTitle>Conversion Trend</CardTitle>
+              <CardDescription>Monthly conversion rate</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={stageData}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    dataKey="value"
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                  >
-                    {stageData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
+                <LineChart data={monthlyData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
                   <Tooltip />
-                </PieChart>
+                  <Line 
+                    type="monotone" 
+                    dataKey="conversions" 
+                    stroke="#10b981" 
+                    strokeWidth={3}
+                    dot={{ fill: '#10b981', strokeWidth: 2, r: 4 }}
+                  />
+                </LineChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
