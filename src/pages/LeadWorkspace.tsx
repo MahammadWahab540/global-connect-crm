@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -75,6 +74,8 @@ interface TaskData {
   password?: string;
   applicationCount?: string;
   sessionDate?: string;
+  user?: string;
+  date?: string;
 }
 
 // Mock lead data
@@ -373,11 +374,13 @@ const LeadWorkspace = () => {
   };
   
   const handleTaskComplete = (taskData: TaskData, resultingStage: string | null) => {
-    setTasks(prev => [...prev, { 
+    const taskWithMetadata: TaskData = { 
       ...taskData, 
       date: new Date().toISOString().split('T')[0], 
       user: 'Sarah Miller' 
-    } as TaskData]);
+    };
+    
+    setTasks(prev => [...prev, taskWithMetadata]);
 
     if (taskData.remarks) {
       setRemarks(prev => [...prev, { 
